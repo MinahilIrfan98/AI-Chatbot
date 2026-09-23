@@ -39,3 +39,4 @@ User → One-shot prompt (main.py) → requests completion → Ollama runtime
 4. Run: `streamlit run app_cloud.py`
 
 ### Quick test (script only)
+python main.py
