@@ -3,40 +3,49 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-# Load the API key from .env file
+# Load the API key
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-# Page title
-st.title("🤖 My AI Chatbot")
+# Page config
+st.set_page_config(page_title="Pixel AI", page_icon="💠")
 
-# Keep chat history saved between messages
+# Title
+st.title("💠 Pixel AI")
+st.caption("Your smart little AI companion, always here to help")
+
+# Avatars
+USER_AVATAR = "🧑"
+BOT_AVATAR = "💠"
+
+# Chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Show previous messages on screen
+# Show previous messages
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    avatar = USER_AVATAR if msg["role"] == "user" else BOT_AVATAR
+    with st.chat_message(msg["role"], avatar=avatar):
         st.write(msg["content"])
 
-# Input box at the bottom for user to type
+# Input box
 user_input = st.chat_input("Type your message here...")
 
 if user_input:
-    # Save and show user's message
     st.session_state.messages.append({"role": "user", "content": user_input})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=USER_AVATAR):
         st.write(user_input)
 
-    # Get response from Groq (cloud AI model)
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
         with st.spinner("Thinking..."):
             response = client.chat.completions.create(
                 model="openai/gpt-oss-20b",
-                messages=st.session_state.messages
+                messages=[
+                    {"role": "system", "content": "You are Pixel AI, a smart and helpful AI assistant."},
+                    *st.session_state.messages
+                ]
             )
             reply = response.choices[0].message.content
             st.write(reply)
 
-    # Save AI's reply to history
     st.session_state.messages.append({"role": "assistant", "content": reply})
